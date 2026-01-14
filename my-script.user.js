@@ -9,8 +9,8 @@
 // @grant        GM_addStyle
 // @grant        GM_setValue
 // @grant        GM_getValue
-// @updateURL    https://raw.githubusercontent.com/b-rad57-pixel/tampermonkey-scripts/main/my-script.user.js
-// @downloadURL  https://raw.githubusercontent.com/b-rad57-pixel/tampermonkey-scripts/main/my-script.user.js
+// @updateURL    https://b-rad57-pixel.github.io/tampermonkey-scripts/my-script.user.js
+// @downloadURL  https://b-rad57-pixel.github.io/tampermonkey-scripts/my-script.user.js
 // ==/UserScript==
 
 
