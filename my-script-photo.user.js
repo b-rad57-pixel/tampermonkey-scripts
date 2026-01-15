@@ -1,14 +1,16 @@
 
 // ==UserScript==
-// @name         Work List - Better GUI v1.9.19
-// @namespace    brad-worklist-gui
-// @version      1.9.19
-// @description  Enhanced GUI with full Default toggle; uniform background via scoped overlay; robust & decoding; grouping, sorting, per-line status, filters, Word export.
-// @match        https://pwr.nsmcloud.com.au/m/default.aspx
-// @run-at       document-load
+// @name         NSM - Unified: Auto Answer + Signature (Robust) + Take Photo
+// @namespace    rtio.nsm.unified
+// @version      3.0.0
+// @description  Auto-answers rules, fills tech name, Next; ticks signature checkbox + robust auto-save; mobile Take Photo modal that injects into file input and clicks native Upload.
+// @match        https://pwr.nsmcloud.com.au/*/ServiceReportQuestion.aspx*AnswersReportID=*
+// @match        https://pwr.nsmcloud.com.au/*/servicereportquestion.aspx*AnswersReportID=*
+// @match        https://pwr.nsmcloud.com.au/m/servicereportquestion.aspx*
+// @match        https://pwr.nsmcloud.com.au/*/signature.aspx*visitId=*
+// @match        https://pwr.nsmcloud.com.au/*/signature.aspx*visitid=*
+// @run-at       document-idle
 // @grant        GM_addStyle
-// @grant        GM_setValue
-// @grant        GM_getValue
 // @updateURL    https://b-rad57-pixel.github.io/tampermonkey-scripts/my-script-photo.user.js
 // @downloadURL  https://b-rad57-pixel.github.io/tampermonkey-scripts/my-script-photo.user.js
 // ==/UserScript==
