@@ -1,3 +1,18 @@
+
+// ==UserScript==
+// @name         Work List - Better GUI v1.9.19
+// @namespace    brad-worklist-gui
+// @version      1.9.19
+// @description  Enhanced GUI with full Default toggle; uniform background via scoped overlay; robust & decoding; grouping, sorting, per-line status, filters, Word export.
+// @match        https://pwr.nsmcloud.com.au/m/default.aspx
+// @run-at       document-load
+// @grant        GM_addStyle
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @updateURL    https://b-rad57-pixel.github.io/tampermonkey-scripts/my-script.photo.js
+// @downloadURL  https://b-rad57-pixel.github.io/tampermonkey-scripts/my-script.photo.js
+// ==/UserScript==
+
 (() => {
   'use strict';
 
