@@ -181,7 +181,7 @@
     return normalize((locationLine||'').replace(/\(\s*(?:[A-Z]{2,5}\d{1,6}\s*)+\)/g,'').replace(/\s{2,}/g,' '));
   }
 
-  // Multi-pass HTML entity decode (&amp;amp; → &amp; → &)
+  // Multi-pass HTML entity decode (&amp;amp;amp; → &amp;amp; → &amp;)
   function decodeHtmlEntitiesMultiple(str){
     let prev=null, loops=0, s=String(str||'');
     while (loops<5 && /&[a-zA-Z#0-9]+;/.test(s)) {
@@ -339,12 +339,15 @@
 
   // Render card
   function renderCard(jobEl, siteCodes, buildingName, serviceLines, completed, lineLinkMap, lineStatusMap){
+    // CHANGED: accurate overall status (partial complete => inProgress)
     let overallStatus = completed ? 'completed' : 'incomplete';
     if (lineStatusMap && Object.keys(lineStatusMap).length){
       const vals = Object.values(lineStatusMap);
-      const allCompleted = vals.every(v => v === 'completed');
+      const allCompleted  = vals.length > 0 && vals.every(v => v === 'completed');
+      const someCompleted = vals.some(v => v === 'completed');
       const anyInProgress = vals.some(v => v === 'inProgress');
-      overallStatus = allCompleted ? 'completed' : (anyInProgress ? 'inProgress' : 'incomplete');
+      overallStatus = allCompleted ? 'completed'
+                                   : ((anyInProgress || someCompleted) ? 'inProgress' : 'incomplete');
     }
 
     const intervals=new Set(); const svcTypes=new Set();
@@ -403,6 +406,19 @@
     jobEl.dataset.tmStatus = overallStatus;
     jobEl.dataset.tmParsed='1';
 
+    // NEW: force left border color to match aggregate status
+    try {
+      jobEl.style.borderLeftWidth = '5px';
+      jobEl.style.borderLeftStyle = 'solid';
+      if (overallStatus === 'completed') {
+        jobEl.style.borderLeftColor = 'rgb(51,255,0)';   // green
+      } else if (overallStatus === 'inProgress') {
+        jobEl.style.borderLeftColor = 'rgb(255,255,0)';  // yellow
+      } else {
+        jobEl.style.borderLeftColor = 'rgba(255,255,255,0.25)'; // neutral
+      }
+    } catch(_) {}
+
     const badges = document.createElement('div'); badges.className='tm-badges';
     const statusBadge = document.createElement('div'); statusBadge.className='tm-badge tm-badge-status';
     statusBadge.textContent = (overallStatus==='completed') ? 'Completed' : ((overallStatus==='inProgress')?'In Progress':'Incomplete');
@@ -421,7 +437,11 @@
     const completedNow=isCompleted(jobEl);
     const inProgressNow=isInProgress(jobEl);
 
-    if (!jobEl.dataset.tmOriginalHTML) jobEl.dataset.tmOriginalHTML = jobEl.innerHTML || '';
+    // CHANGED: also save original style so we can restore on Default toggle
+    if (!jobEl.dataset.tmOriginalHTML) {
+      jobEl.dataset.tmOriginalHTML = jobEl.innerHTML || '';
+      jobEl.dataset.tmOriginalStyle = jobEl.getAttribute('style') || '';
+    }
 
     if(jobEl.dataset.tmParsed==='1'){
       jobEl.dataset.tmCompleted=completedNow?'1':'0';
@@ -492,10 +512,11 @@
     const lines=[]; const lineLinks={}; const lineStatuses={};
     const sorted=Array.from(best.values()).sort((a,b)=>orderForType(a.type)-orderForType(b.type) || (b.interval-a.interval) || a.zone.localeCompare(b.zone));
 
+    // CHANGED: partial complete => inProgress
     const deriveStatus = (type, zone) => {
       const s = stats.get(`${type}||${zone||''}`) || { total:0, completed:0, inProgress:0 };
       if (s.total > 0 && s.completed === s.total) return 'completed';
-      if (s.inProgress > 0) return 'inProgress';
+      if (s.inProgress > 0 || (s.completed > 0 && s.completed < s.total)) return 'inProgress';
       return 'incomplete';
     };
 
@@ -829,6 +850,7 @@
       job.dataset.tmGrouped = '';
       job.dataset.tmParsed = '';
       if (job.dataset.tmOriginalHTML) job.innerHTML = job.dataset.tmOriginalHTML;
+      if (job.dataset.tmOriginalStyle !== undefined) job.setAttribute('style', job.dataset.tmOriginalStyle || ''); // NEW: restore style
       delete job.dataset.tmPhraseMeta;
       delete job.dataset.tmSiteCodes;
       delete job.dataset.tmSiteCode;
